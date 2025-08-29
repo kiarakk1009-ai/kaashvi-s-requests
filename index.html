@@ -17,6 +17,7 @@ body {
   align-items: center;
   font-family: 'Gista Danes', 'Poppins', sans-serif;
   position: relative;
+  cursor: none; /* hide default cursor for magical effect */
 }
 
 /* Glow behind card */
@@ -90,7 +91,7 @@ iframe:hover { transform: scale(1.02); }
 .heart::after, .side-heart::after { left: 7.5px; top: 0; }
 
 /* Stars & sparkles */
-.star, .sparkle {
+.star, .sparkle, .cursor-sparkle {
   position: absolute;
   width: 4px;
   height: 4px;
@@ -126,8 +127,8 @@ iframe:hover { transform: scale(1.02); }
 <div class="side-heart" style="top:50%; right:5%;"></div>
 
 <script>
-// Create floating hearts or sparkles
-function createFloating(className, color='#ff87ab', size=15, x=null, y=null, dx=0, dy=-window.innerHeight){
+// Create floating hearts, stars, sparkles
+function createFloating(className, color='#ff87ab', size=15, x=null, y=null, dx=0){
   const el = document.createElement('div');
   el.className = className;
   el.style.background = color;
@@ -171,7 +172,7 @@ card.addEventListener('mouseleave', ()=>{ glow.style.transform='scale(1)'; });
 document.body.addEventListener('click', (e)=>{
   if(!card.contains(e.target)){
     for(let i=0;i<5;i++){
-      createFloating('heart','#ff87ab',12,e.clientX,e.clientY,Math.random()*40-20,-Math.random()*100-50);
+      createFloating('heart','#ff87ab',12,e.clientX,e.clientY,Math.random()*40-20);
     }
   }
 });
@@ -180,6 +181,18 @@ document.body.addEventListener('click', (e)=>{
 document.querySelectorAll('.side-heart').forEach(h=>{
   h.addEventListener('mouseenter', ()=>{ h.style.animation = 'pulse 0.6s ease infinite'; });
   h.addEventListener('mouseleave', ()=>{ h.style.animation = ''; });
+});
+
+// Cursor-following sparkles
+document.addEventListener('mousemove', e=>{
+  const sparkle = document.createElement('div');
+  sparkle.className = 'cursor-sparkle';
+  sparkle.style.left = e.clientX+'px';
+  sparkle.style.top = e.clientY+'px';
+  sparkle.style.width = sparkle.style.height = (2 + Math.random()*3)+'px';
+  sparkle.style.opacity = 0.7;
+  document.body.appendChild(sparkle);
+  setTimeout(()=>sparkle.remove(), 800);
 });
 </script>
 
