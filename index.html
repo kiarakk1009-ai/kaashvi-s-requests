@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #ffc0cb, #ffe6f0);
+    background: linear-gradient(135deg, #ffe6f0, #ffc0cb);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,7 +18,7 @@
   }
 
   .card {
-    background: white;
+    background: #ffb6c1; /* light pink card */
     padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -30,13 +30,13 @@
   }
 
   .card:hover {
-    transform: translateY(-15px) scale(1.07) rotate(-1deg);
+    transform: scale(1.05); /* scale up smoothly, no tilt */
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
   }
 
   h1 {
     font-size: 1.5rem;
-    color: white; /* white text */
+    color: white;
     margin-bottom: 1rem;
   }
 
@@ -52,32 +52,15 @@
     transform: scale(1.02);
   }
 
-  body::before {
-    content: '';
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    top: 20%;
-    left: 10%;
-    animation: float 6s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-  }
-
   .sparkle, .heart {
     position: absolute;
     pointer-events: none;
-    z-index: 1;
     border-radius: 50%;
+    z-index: 1;
   }
 
   .sparkle { background: yellow; }
-  .heart { background: pink; transform: rotate(45deg); }
+  .heart { background: #ff77a9; transform: rotate(45deg); } /* darker pink hearts */
 
   @keyframes floatAnim {
     0% { transform: translateY(0) scale(0.5); opacity:0.5; }
@@ -87,37 +70,49 @@
 </style>
 </head>
 <body>
-  <div class="card">
+  <div class="card" id="card">
     <h1>Send me a request 💌</h1>
     <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdSFIhfWELsSeZvu0PsmiSIDm7CWLUWFsMN82ghMF62S8QKWw/viewform?embedded=true" scrolling="no"></iframe>
   </div>
 
-  <script>
-    window.onload = () => {
-      const bodyEl = document.body;
+<script>
+  const bodyEl = document.body;
+  const card = document.getElementById('card');
 
-      function createFloating(type, color) {
-        const el = document.createElement('div');
-        el.className = type;
-        el.style.background = color;
-        const size = 5 + Math.random() * 12; // random size 5px-17px
-        el.style.width = size + 'px';
-        el.style.height = size + 'px';
-        el.style.left = Math.random() * window.innerWidth + 'px';
-        el.style.top = Math.random() * window.innerHeight + 'px';
-        el.style.opacity = 0.5 + Math.random() * 0.5;
-        const duration = 3 + Math.random() * 3;
-        el.style.animation = `floatAnim ${duration}s linear infinite`;
-        bodyEl.appendChild(el);
-      }
+  function createFloating(type, color, count = 1) {
+    for(let i=0;i<count;i++){
+      const el = document.createElement('div');
+      el.className = type;
+      el.style.background = color;
+      const size = 5 + Math.random() * 12;
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.left = Math.random() * window.innerWidth + 'px';
+      el.style.top = Math.random() * window.innerHeight + 'px';
+      el.style.opacity = 0.5 + Math.random() * 0.5;
+      const duration = 3 + Math.random() * 3;
+      el.style.animation = `floatAnim ${duration}s linear infinite`;
+      bodyEl.appendChild(el);
+    }
+  }
 
-      for(let i=0; i<40; i++){
-        createFloating('sparkle','yellow');
-        createFloating('heart','pink');
-      }
-    };
-  </script>
+  // initial hearts
+  createFloating('heart','#ff77a9',40);
+
+  // hover events
+  card.addEventListener('mouseenter', () => {
+    createFloating('sparkle','yellow',15);
+  });
+
+  bodyEl.addEventListener('mousemove', (e) => {
+    // optional: create small hearts near cursor on hover
+    // detect if hovering over heart elements (or can spawn periodically)
+  });
+
+  // increase hearts on hover over body
+  card.addEventListener('mouseover', () => {
+    createFloating('heart','#ff77a9',10);
+  });
+</script>
 </body>
 </html>
-
-
