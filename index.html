@@ -40,30 +40,24 @@ iframe {
   border-radius: 15px;
 }
 
-.floating {
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-}
-
+/* Heart structure */
 .heart {
   width: 20px;
   height: 20px;
-  background: #ff4d94;
   position: absolute;
   transform: rotate(-45deg);
 }
-.heart::before,
-.heart::after {
-  content: "";
+
+.heart div {
   position: absolute;
   width: 20px;
   height: 20px;
   background: #ff4d94;
   border-radius: 50%;
 }
-.heart::before { top: -10px; left: 0; }
-.heart::after { left: 10px; top: 0; }
+
+.heart .left { left: -10px; top: 0; }
+.heart .right { left: 0; top: -10px; }
 
 .sparkle {
   width: 5px;
@@ -77,6 +71,17 @@ iframe {
   50% { transform: translateY(-150px) scale(1); opacity:1; }
   100% { transform: translateY(-300px) scale(0.5); opacity:0; }
 }
+
+@keyframes floatSide {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes backgroundFloat {
+  0% { transform: translateY(0) scale(0.5); opacity:0.4; }
+  50% { transform: translateY(-100px) scale(0.8); opacity:0.8; }
+  100% { transform: translateY(-200px) scale(0.5); opacity:0.4; }
+}
 </style>
 </head>
 <body>
@@ -87,48 +92,84 @@ iframe {
 </div>
 
 <!-- side hearts -->
-<div class="heart" id="leftHeart" style="left: 50px; top: 50%; transform: translateY(-50%) rotate(-45deg); pointer-events:auto;"></div>
-<div class="heart" id="rightHeart" style="right: 50px; top: 50%; transform: translateY(-50%) rotate(-45deg); pointer-events:auto;"></div>
+<div class="heart" id="leftHeart" style="left:50px; top:50%; transform:translateY(-50%) rotate(-45deg);"></div>
+<div class="heart" id="rightHeart" style="right:50px; top:50%; transform:translateY(-50%) rotate(-45deg);"></div>
 
 <script>
 const bodyEl = document.body;
 
-// create floating heart or sparkle
-function createFloating(type, color, count=1, x=null, y=null){
-  for(let i=0;i<count;i++){
-    const el = document.createElement('div');
-    el.classList.add(type);
-    el.style.background = color;
-    const size = type==='heart'?20:5;
-    el.style.width = el.style.height = size + 'px';
-    el.style.left = x !== null ? x + 'px' : Math.random()*window.innerWidth + 'px';
-    el.style.top = y !== null ? y + 'px' : Math.random()*window.innerHeight + 'px';
-    el.style.opacity = 0.5 + Math.random()*0.5;
-    el.style.animation = `floatAnim ${3+Math.random()*3}s linear infinite`;
-    bodyEl.appendChild(el);
+// create a heart div
+function makeHeart(x, y, color, anim=true){
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.style.left = x + 'px';
+  heart.style.top = y + 'px';
+  heart.style.background = 'transparent';
+  
+  const left = document.createElement('div');
+  left.className = 'left';
+  left.style.background = color;
+  const right = document.createElement('div');
+  right.className = 'right';
+  right.style.background = color;
+  
+  heart.appendChild(left);
+  heart.appendChild(right);
+  
+  if(anim){
+    heart.style.animation = `backgroundFloat ${3+Math.random()*3}s linear infinite`;
   }
+  
+  bodyEl.appendChild(heart);
+}
+
+// create a sparkle
+function makeSparkle(x, y){
+  const s = document.createElement('div');
+  s.className = 'sparkle';
+  s.style.left = x + 'px';
+  s.style.top = y + 'px';
+  bodyEl.appendChild(s);
 }
 
 // card hover → sparkles
 const card = document.getElementById('card');
 card.addEventListener('mouseenter', () => {
-  createFloating('sparkle','white',15);
-});
-
-// background click → hearts
-bodyEl.addEventListener('click', e => {
-  if(!card.contains(e.target)){
-    createFloating('heart','#ff4d94',8);
+  for(let i=0;i<15;i++){
+    makeSparkle(Math.random()*window.innerWidth, Math.random()*window.innerHeight);
   }
 });
 
-// hover side hearts → spawn hearts
-['leftHeart','rightHeart'].forEach(id => {
-  document.getElementById(id).addEventListener('mouseenter', e => {
-    const rect = e.target.getBoundingClientRect();
-    createFloating('heart','#ff4d94',6, rect.left+rect.width/2, rect.top+rect.height/2);
-  });
+// background click → hearts
+bodyEl.addEventListener('click', e=>{
+  if(!card.contains(e.target)){
+    for(let i=0;i<8;i++){
+      makeHeart(Math.random()*window.innerWidth, Math.random()*window.innerHeight, '#ff4d94');
+    }
+  }
 });
+
+// side hearts floating
+['leftHeart','rightHeart'].forEach(id=>{
+  const el = document.getElementById(id);
+  el.style.animation = 'floatSide 2s ease-in-out infinite';
+  
+  // hover → spawn hearts gradually
+  let interval;
+  el.addEventListener('mouseenter', e=>{
+    interval = setInterval(()=>{
+      const rect = e.target.getBoundingClientRect();
+      makeHeart(rect.left+10, rect.top+10, '#ff4d94');
+    }, 300);
+  });
+  el.addEventListener('mouseleave', ()=>{ clearInterval(interval); });
+});
+
+// background dreamy hearts
+for(let i=0;i<20;i++){
+  makeHeart(Math.random()*window.innerWidth, Math.random()*window.innerHeight, '#ff4d94');
+}
 </script>
 </body>
 </html>
+
