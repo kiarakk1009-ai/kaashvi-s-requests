@@ -18,7 +18,7 @@
   }
 
   .card {
-    background: #ffb6c1;
+    background: #ffb6c1; /* light pink card */
     padding: 2rem;
     border-radius: 20px;
     width: 340px;
@@ -59,12 +59,29 @@
   }
 
   .heart {
-    background: #ff77a9;
+    background: #ff4d94; /* darker pink hearts */
+    width: 12px;
+    height: 12px;
     transform: rotate(45deg);
   }
 
+  .heart:before,
+  .heart:after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #ff4d94;
+    border-radius: 50%;
+  }
+  .heart:before { top: -6px; left: 0; }
+  .heart:after { left: 6px; top: 0; }
+
   .sparkle {
     background: yellow;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
   }
 
   @keyframes floatAnim {
@@ -81,32 +98,41 @@
 </div>
 
 <script>
-  const bodyEl = document.body;
-  const card = document.getElementById('card');
+const bodyEl = document.body;
+const card = document.getElementById('card');
 
-  function createFloating(type, color, count=1){
-    for(let i=0;i<count;i++){
-      const el = document.createElement('div');
-      el.classList.add('floating', type);
-      el.style.background = color;
-      const size = 5 + Math.random() * 12;
-      el.style.width = el.style.height = size + 'px';
-      el.style.left = Math.random() * window.innerWidth + 'px';
-      el.style.top = Math.random() * window.innerHeight + 'px';
-      el.style.opacity = 0.5 + Math.random() * 0.5;
-      el.style.animation = `floatAnim ${3 + Math.random() * 3}s linear infinite`;
-      bodyEl.appendChild(el);
-    }
+// Function to create hearts or sparkles
+function createFloating(type, color, count=1){
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.classList.add('floating', type);
+    el.style.background = color;
+    const size = 8 + Math.random() * 12;
+    el.style.width = el.style.height = size + 'px';
+    el.style.left = Math.random() * window.innerWidth + 'px';
+    el.style.top = Math.random() * window.innerHeight + 'px';
+    el.style.opacity = 0.5 + Math.random() * 0.5;
+    const duration = 3 + Math.random() * 3;
+    el.style.animation = `floatAnim ${duration}s linear infinite`;
+    bodyEl.appendChild(el);
   }
+}
 
-  // initial hearts
-  createFloating('heart', '#ff77a9', 40);
+// Initial hearts in background
+createFloating('heart','#ff4d94',40);
 
-  // spawn hearts & sparkles when hovering the card
-  card.addEventListener('mouseenter', () => {
-    createFloating('heart', '#ff77a9', 10);
-    createFloating('sparkle', 'yellow', 15);
-  });
+// Hover over card → sparkles
+card.addEventListener('mouseenter', () => {
+  createFloating('sparkle','yellow',15);
+  createFloating('heart','#ff4d94',10);
+});
+
+// Click anywhere on background → extra hearts
+bodyEl.addEventListener('click', (e) => {
+  if(!card.contains(e.target)){
+    createFloating('heart','#ff4d94',10);
+  }
+});
 </script>
 </body>
 </html>
